@@ -14,12 +14,10 @@ export default class App extends React.Component {
 
   datastores = {};
 
-  async componentWillMount() {
+  async componentDidMount() {
     await initKinvey();
     this._createDatastores();
-  }
 
-  async componentDidMount() {
     await this._getActiveUser();
     this._getAllBooks();
   }
@@ -31,16 +29,18 @@ export default class App extends React.Component {
   }
 
   async _getActiveUser() {
-    const userData = await retrieve();
-
-    if (userData) {
+    try {
+      const userData = await retrieve();
       Kinvey.client.setActiveUser(userData);
+
+      const found = Kinvey.User.getActiveUser();
+      this.setState({ user: found })
+
+      return found;
+    } catch(err) {
+      console.log('No active user.');
+      return undefined;
     }
-
-    const found = Kinvey.User.getActiveUser();
-    this.setState({ user: found })
-
-    return found;
   }
 
   _logIn = async () => {
@@ -54,6 +54,7 @@ export default class App extends React.Component {
   }
 
   _getAllBooks() {
+    debugger
     const stream = this.datastores.books.find();
 
     stream.subscribe(books => {
