@@ -43,6 +43,7 @@ export default class App extends React.Component {
   }
 
   datastores = {};
+  chance = new Chance();
 
   _createDatastores() {
     this.datastores = {
@@ -87,12 +88,10 @@ export default class App extends React.Component {
   }
 
   _saveARecord = async () => {
-    const chance = new Chance();
-
     try {
       await this.datastores.books.save({
-        author: chance.name(),
-        title: chance.word()
+        author: this.chance.name(),
+        title: this.chance.word()
       });
 
       this._getAllBooks();
