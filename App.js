@@ -3,6 +3,8 @@ import { AsyncStorage } from 'react-native';
 import Chance from 'chance';
 import Kinvey from 'kinvey-react-native-sdk';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import initKinvey from './init-kinvey';
+import { retrieve, persist } from './persist-user';
 
 export default class App extends React.Component {
   state = {
@@ -12,8 +14,8 @@ export default class App extends React.Component {
 
   datastores = {};
 
-  componentWillMount() {
-    this._initKinvey();
+  async componentWillMount() {
+    await initKinvey();
     this._createDatastores();
   }
 
@@ -28,18 +30,11 @@ export default class App extends React.Component {
     }
   }
 
-  _initKinvey() {
-    Kinvey.initialize({
-      appKey: 'kid_Bkj9lZ_i-',
-      appSecret: '5100575c37d34326aca1d3fd33976365'
-    });
-  }
-
   async _getActiveUser() {
-    const user = await AsyncStorage.getItem('activeUser');
+    const userData = await retrieve();
 
-    if (user) {
-      Kinvey.client.setActiveUser(JSON.parse(user).data);
+    if (userData) {
+      Kinvey.client.setActiveUser(userData);
     }
 
     const found = Kinvey.User.getActiveUser();
@@ -54,10 +49,8 @@ export default class App extends React.Component {
       password: 'password'
     });
 
-    console.log(user)
-
     this.setState({ user: user.data });
-    AsyncStorage.setItem('activeUser', JSON.stringify(user))
+    return persist(user);
   }
 
   _getAllBooks() {
