@@ -7,7 +7,6 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 export default class App extends React.Component {
   state = {
     user: null,
-    savedBook: null,
     books: []
   };
 
@@ -63,6 +62,7 @@ export default class App extends React.Component {
 
   _getAllBooks() {
     const stream = this.datastores.books.find();
+
     stream.subscribe(books => {
       console.log('found some books', books);
       this.setState({ books });
