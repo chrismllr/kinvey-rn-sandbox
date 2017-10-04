@@ -54,7 +54,6 @@ export default class App extends React.Component {
   }
 
   _getAllBooks() {
-    debugger
     const stream = this.datastores.books.find();
 
     stream.subscribe(books => {
