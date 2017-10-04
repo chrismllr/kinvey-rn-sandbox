@@ -1,0 +1,8 @@
+{
+  "extends": "@dialexa/eslint-config-dialexa/react",
+  "rules": {
+    "arrow-parens": ["error", "as-needed"],
+    "no-console": 0,
+    "no-alert": 0
+  }
+}

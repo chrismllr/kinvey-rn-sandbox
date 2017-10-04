@@ -1,18 +1,38 @@
 import React from 'react';
-import { AsyncStorage } from 'react-native';
 import Chance from 'chance';
 import Kinvey from 'kinvey-react-native-sdk';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+
 import initKinvey from './init-kinvey';
 import { retrieve, persist } from './persist-user';
+
+const styles = StyleSheet.create({
+  section: {
+    marginBottom: 20,
+    alignItems: 'center'
+  },
+  bold: {
+    fontSize: 16,
+    fontWeight: '700'
+  },
+  button: {
+    color: 'tomato',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+});
 
 export default class App extends React.Component {
   state = {
     user: null,
     books: []
   };
-
-  datastores = {};
 
   async componentDidMount() {
     await initKinvey();
@@ -22,10 +42,15 @@ export default class App extends React.Component {
     this._getAllBooks();
   }
 
+  datastores = {};
+
   _createDatastores() {
     this.datastores = {
-      books: Kinvey.DataStore.collection('books', Kinvey.DataStoreType.Cache)
-    }
+      books: Kinvey.DataStore.collection(
+        'books',
+        Kinvey.DataStoreType.Cache
+      )
+    };
   }
 
   async _getActiveUser() {
@@ -34,11 +59,10 @@ export default class App extends React.Component {
       Kinvey.client.setActiveUser(userData);
 
       const found = Kinvey.User.getActiveUser();
-      this.setState({ user: found })
+      this.setState({ user: found });
 
       return found;
-    } catch(err) {
-      console.log('No active user.');
+    } catch (err) {
       return undefined;
     }
   }
@@ -59,20 +83,20 @@ export default class App extends React.Component {
     stream.subscribe(books => {
       console.log('found some books', books);
       this.setState({ books });
-    })
+    });
   }
 
   _saveARecord = async () => {
     const chance = new Chance();
 
     try {
-      const res = await this.datastores.books.save({
+      await this.datastores.books.save({
         author: chance.name(),
         title: chance.word()
       });
-  
+
       this._getAllBooks();
-    } catch(err) {
+    } catch (err) {
       alert(err);
     }
   }
@@ -85,12 +109,12 @@ export default class App extends React.Component {
             <Text style={styles.bold}>{this.state.user.username} is now logged in.</Text>
           )}
         </View>
-        
+
         <View style={styles.section}>
           <Text style={styles.bold}>Current Books</Text>
 
           {this.state.books.map((bk, i) => (
-            <Text key={i}>"{bk.title}" by {bk.author}</Text>
+            <Text key={i}>{bk.title} by {bk.author}</Text>
           ))}
         </View>
 
@@ -101,7 +125,7 @@ export default class App extends React.Component {
             </TouchableOpacity>
           }
         </View>
-        
+
         <View style={styles.section}>
           <TouchableOpacity onPress={this._saveARecord}>
             <Text style={styles.button}>Create a book</Text>
@@ -111,25 +135,3 @@ export default class App extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  section: {
-    marginBottom: 20,
-    alignItems: 'center'
-  },
-  bold: {
-    fontSize: 16,
-    fontWeight: '700'
-  },
-  button: {
-    color: 'tomato',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
