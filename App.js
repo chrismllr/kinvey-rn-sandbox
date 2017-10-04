@@ -38,8 +38,12 @@ export default class App extends React.Component {
     await initKinvey();
     this._createDatastores();
 
-    await this._getActiveUser();
-    this._getAllBooks();
+    try {
+      await this._getActiveUser();
+      this._getAllBooks();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   datastores = {};
@@ -64,7 +68,7 @@ export default class App extends React.Component {
 
       return found;
     } catch (err) {
-      return undefined;
+      throw err;
     }
   }
 
